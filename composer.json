@@ -1,0 +1,52 @@
+{
+  "name": "plokko/laravel-firebase",
+  "description": "Laravel Firebase integration",
+  "license": "MIT",
+  "keywords": [
+    "laravel",
+    "firebase",
+    "fcm",
+    "realtime database"
+  ],
+  "type": "library",
+  "require": {
+    "php": ">=5.6",
+    "plokko/firebase-php":"*@dev",
+    "illuminate/support": "^5.4.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "~3.6.0",
+    "phpunit/phpunit": "~7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Plokko\\LaravelFirebase\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Plokko\\LaravelFirebase\\Tests\\": "tests"
+    },
+    "files": [
+      "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
+    ]
+  },
+  "scripts": {
+    "phpunit": "phpunit"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Plokko\\LaravelFirebase\\ServiceProvider"
+      ],
+      "aliases": {
+        "FirebaseDb": "Plokko\\LaravelFirebase\\Facades\\FirebaseDb"
+      }
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}
