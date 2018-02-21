@@ -1,41 +1,46 @@
 <?php
 namespace Plokko\LaravelFirebase\Traits;
 
+use Plokko\Firebase\IO\Reference;
 use Plokko\LaravelFirebase\Collections\SyncsWithFirebaseCollection;
+use Plokko\LaravelFirebase\Facades\FirebaseDb;
+use Plokko\LaravelFirebase\ModelSynchronizer;
 
 /**
  * Trait FirebaseSynchronizable
  * apply this trait to an eloquent Model to add Firebase real-time database synchronization
  * @mixin \Illuminate\Database\Eloquent\Model
  * @package Plokko\FirebaseSync\Traits
- * @property string|null $firebaseReference optional name to use in Firebase, if not specified table name will be used
  */
 trait FirebaseSynchronizable
 {
     /*
-     private
+     protected
          $firebaseReference
      */
-    public static function bootSyncWithFirebase(){
 
+    public static function bootFirebaseSynchronizable(){
         static::created(function ($model) {
-            $model->syncToFirebase('set');
+            ModelSynchronizer::create($model);
         });
+
         static::updated(function ($model) {
-            $model->syncToFirebase('update');
+            ModelSynchronizer::update($model);
         });
+
         static::deleted(function ($model) {
-            $model->syncToFirebase('delete');
+            /**@var $model $this**/
+            ModelSynchronizer::delete($model);
         });
         if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses(self::class))){
             static::restored(function ($model) {
-                $model->syncToFirebase('set');
+                ModelSynchronizer::create($model);
             });
         }
     }
 
     public function syncWithFirebase(){
-        $this->syncToFirebase('update');
+        ModelSynchronizer::create($this);
     }
 
     /**
@@ -43,32 +48,31 @@ trait FirebaseSynchronizable
      * to allow bulk syncWithFirebase
      * @param array $models
      * @return SyncsWithFirebaseCollection
+     * @internal
      */
     public function newCollection(array $models = [])
     {
         return new SyncsWithFirebaseCollection($models);
     }
 
-    protected function getFirebaseReference(){
-
+    /**
+     * Data to be synchronized with Firebase
+     * @return array
+     */
+    public function getFirebaseSyncData()
+    {
+        if ($fresh = $this->fresh()) {
+            return $fresh->toArray();
+        }
+        return [];
     }
 
     /**
-     * @param $mode
+     * @return string reference name
      */
-    protected function syncToFirebase($mode)
-    {
-        /*
-
-        $path = (!empty($this->firebaseReference)?$this->_firebaseReference:$this->getTable()) . '/' . $this->getKey();
-
-        if ($mode === 'set') {
-            $this->firebaseClient->set($path, $this->getFirebaseSyncData());
-        } elseif ($mode === 'update') {
-            $this->firebaseClient->update($path, $this->getFirebaseSyncData());
-        } elseif ($mode === 'delete') {
-            $this->firebaseClient->delete($path);
-        }
-        */
+    public function getFirebaseReferenceName(){
+        return $this->getTable();
     }
+
+
 }
