@@ -12,8 +12,10 @@ use Plokko\LaravelFirebase\Collections\SyncsWithFirebaseCollection;
  */
 trait FirebaseSynchronizable
 {
-    //private $firebaseReference
-
+    /*
+     private
+         $firebaseReference
+     */
     public static function bootSyncWithFirebase(){
 
         static::created(function ($model) {

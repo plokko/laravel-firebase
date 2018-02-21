@@ -44,5 +44,14 @@ php artisan vendor:publish --provider="Plokko\LaravelFirebase\ServiceProvider" -
 
 ## Usage
 
-WIP
+###FCM
 
+
+### Real time database
+To get an instance of the database use the `FirebaseDb` facade:
+``
+$test = FirebaseDb::getReference('test'); //get the reference for item /test
+$test->get('01');//Get /test/01 as an array
+$test01 = $test->getReference('01');//Get a reference for /test/01
+$test01->set('label','value');//Set /test/01/label = value
+```
