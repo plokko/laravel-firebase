@@ -11,15 +11,23 @@ class ModelSynchronizer
     private function __construct(){}
 
     private static function getData(Model $model){
-        return $model->getFirebaseSyncData();
+        return $model->toFirebase();
     }
 
     /**
      * @param Model $model
      * @return Reference
      */
-    private static function getReference(Model $model){
-        return FirebaseDb::getReference($model->getFirebaseReferenceName().'/'.$model->getKey());
+    private static function getReference(Model $model,$id=null){
+        return FirebaseDb::getReference($model->getFirebaseReferenceName().'/'.($id?:$model->getKey()));
+    }
+
+    /**
+     * @param Model $model
+     * @return Reference
+     */
+    private static function getBaseReference(Model $model){
+        return FirebaseDb::getReference($model->getFirebaseReferenceName());
     }
 
     /**
@@ -34,6 +42,16 @@ class ModelSynchronizer
      */
     static function delete(Model $model){
         self::getReference($model)->delete();
+    }
+
+    /**
+     * @param Model $model model to be deleted
+     */
+    static function deletes(Model $model,array $ids){
+        $ref = self::getBaseReference($model);
+        foreach($ids AS $id){
+            $ref->delete($id);
+        }
     }
 
     /**

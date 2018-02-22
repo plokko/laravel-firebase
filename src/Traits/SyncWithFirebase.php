@@ -1,9 +1,7 @@
 <?php
 namespace Plokko\LaravelFirebase\Traits;
 
-use Plokko\Firebase\IO\Reference;
 use Plokko\LaravelFirebase\Collections\SyncsWithFirebaseCollection;
-use Plokko\LaravelFirebase\Facades\FirebaseDb;
 use Plokko\LaravelFirebase\ModelSynchronizer;
 
 /**
@@ -12,14 +10,14 @@ use Plokko\LaravelFirebase\ModelSynchronizer;
  * @mixin \Illuminate\Database\Eloquent\Model
  * @package Plokko\FirebaseSync\Traits
  */
-trait FirebaseSynchronizable
+trait SyncWithFirebase
 {
     /*
      protected
          $firebaseReference
      */
 
-    public static function bootFirebaseSynchronizable(){
+    public static function bootSyncWithFirebase(){
         static::created(function ($model) {
             ModelSynchronizer::create($model);
         });
@@ -59,7 +57,7 @@ trait FirebaseSynchronizable
      * Data to be synchronized with Firebase
      * @return array
      */
-    public function getFirebaseSyncData()
+    public function toFirebase()
     {
         if ($fresh = $this->fresh()) {
             return $fresh->toArray();
