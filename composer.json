@@ -40,7 +40,8 @@
         "Plokko\\LaravelFirebase\\ServiceProvider"
       ],
       "aliases": {
-        "FirebaseDb": "Plokko\\LaravelFirebase\\Facades\\FirebaseDb"
+        "FirebaseDb": "Plokko\\LaravelFirebase\\Facades\\FirebaseDb",
+        "FCM": "Plokko\\LaravelFirebase\\Facades\\FCM"
       }
     }
   },

@@ -40,6 +40,15 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app->singleton(Database::class,function($app){
             return new Database($app->make(ServiceAccount::class));
         });
+        $this->app->bind(FcmMessageBuilder::class,function($app){
+            $fcm = new FcmMessageBuilder($app->make(ServiceAccount::class));
+
+            $event = $app->config('laravel-firebase.FCMInvalidTokenTriggerEvent');
+            if($event){
+                $fcm->setInvalidTokenEvent($event);
+            }
+            return $fcm;
+        });
     }
 
 
