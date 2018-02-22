@@ -49,6 +49,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             }
             return $fcm;
         });
+
+        $this->app->singleton(JWT::class,function($app){
+            return new JWT($app->make(ServiceAccount::class));
+        });
     }
 
 
