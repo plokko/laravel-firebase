@@ -86,7 +86,7 @@ class FcmMessageBuilder
             }
             throw $e;
         }
-}
+
     }
 
     /**
