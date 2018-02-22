@@ -9,6 +9,6 @@ class FirebaseJWT extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return  JWT::class;
+            return  JWT::class;
     }
 }
