@@ -11,7 +11,7 @@ class SyncWithFirebaseBelongsToMany extends BelongsToMany
          * @var bool
          * @internal internal use only
          */
-        $_syncWithFirebase = true;
+        $_isSynching = true;
 
     public function attach($id, array $attributes = [], $touch = true)
     {
@@ -38,9 +38,9 @@ class SyncWithFirebaseBelongsToMany extends BelongsToMany
     {
         // Temporary disable Firebase synching to avoid
         // triggering multiple attach/detach syncs
-        $this->_syncWithFirebase = false;
+        $this->_isSynching = false;
         parent::sync($ids,$detaching);
-        $this->_syncWithFirebase = true;
+        $this->_isSynching = true;
 
         //Sync with firebase
         $this->syncParentWithFirebase();
@@ -54,7 +54,7 @@ class SyncWithFirebaseBelongsToMany extends BelongsToMany
     }
 
     protected function syncParentWithFirebase(){
-        if($this->_syncWithFirebase){
+        if($this->_isSynching){
             //TODO:should only update touched relation
             $this->parent->syncWithFirebase();
         }
