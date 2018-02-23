@@ -44,7 +44,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app->bind(FcmMessageBuilder::class,function($app){
             $fcm = new FcmMessageBuilder($app->make(ServiceAccount::class));
 
-            $event = $app->config('laravel-firebase.FCMInvalidTokenTriggerEvent');
+            $event = config('laravel-firebase.FCMInvalidTokenTriggerEvent');
             if($event){
                 $fcm->setInvalidTokenEvent($event);
             }
