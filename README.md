@@ -44,8 +44,46 @@ php artisan vendor:publish --provider="Plokko\LaravelFirebase\ServiceProvider" -
 
 ## Usage
 
-###FCM
+### FCM
+This package allows you to send FCM messages via FCM http v1 api
+#### Message builder
+You can easly build FCM Messages via the `FCM` facade:
+```php
 
+FCM::notificationTitle('My notification title')
+  ->notificationBody('my notification body...');
+  ->data(['notification' => 'data'])
+  ->highPriority()//note: not all devices may use all the fields like priority or ttl
+  ->ttl('20.5s')
+  ->toDevice('my-device-fcm-token') // or toTopic('topic-name') or toCondition('condition-name') or toTarget(Target)
+  ->send();//Submits the message
+```
+#### FCM Notification channel
+You can also send the FCM messages via the `FcmNotificationChannel` channel:
+```php
+class TestFcmNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+    
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function via($notifiable)
+    {
+        return [FcmNotificationChannel::class];
+    }
+
+    public function toFcm($notifiable)
+    {
+        return FCM::notificationTitle('Test notification')
+                    ->notificationBody('notification body...')
+                    ->toDevice($notifiable->deviceToken);
+    }
+}
+```
 
 ### Real time database
 To get an instance of the database use the `FirebaseDb` facade:
