@@ -6,6 +6,7 @@ use Plokko\Firebase\ServiceAccount;
 use Plokko\Firebase\FCM\{
     Exceptions\UnregisteredException, Message, Request, Targets\Condition, Targets\Target, Targets\Token, Targets\Topic
 };
+use Plokko\LaravelFirebase\Exceptions\FcmTargetNotSpecifiedException;
 
 class FcmMessageBuilder
 {
@@ -48,6 +49,11 @@ class FcmMessageBuilder
         return $this;
     }
 
+    /**
+     * Set the message priority
+     * @param 'high'|"normal" $priority
+     * @return $this
+     */
     function priority($priority){
         if($priority!=='high' && $priority!=='normal')
             throw new \InvalidArgumentException('Invalid priority value!');
@@ -65,6 +71,11 @@ class FcmMessageBuilder
         return $this;
     }
 
+    /**
+     * Set the time to live of the message
+     * @param string $ttl TTL as a string (ex. '14.5s')
+     * @return $this
+     */
     function ttl($ttl){
         $this->message->android->ttl($ttl);
         return $this;
@@ -72,48 +83,64 @@ class FcmMessageBuilder
 
 
     /**
+     * Set the message destination,
+     * this field is MANDATORY to submit the message
      * @param Target $target
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException
+     * @return $this
      */
-    function send(Target $target){
+    function toTarget(Target $target){
         $this->message->setTarget($target);
+        return $this;
+    }
+
+    /**
+     * Set the message destination to a device token
+     * @param string $token Target device FCM token
+     * @return $this
+     */
+    function toDevice($token){
+        return $this->toTarget(new Token($token));
+    }
+
+    /**
+     * Set the message destination to a topic name
+     * @param string $topicName Target topic name
+     * @return $this
+     */
+    function toTopic($topicName){
+        return $this->toTarget(new Topic($topicName));
+    }
+
+    /**
+     * Set the message destination to a condition
+     * @param string $condition Target condition
+     * @return $this
+     */
+    function toCondition($condition){
+        return $this->toTarget(new Condition($condition));
+    }
+
+    /**
+     * Sends the message
+     * If no target is specified a FcmTargetNotSpecifiedException will be thrown
+     * @throws \GuzzleHttp\Exception\GuzzleException Generic http exception
+     * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException FCMError exception
+     * @throws FcmTargetNotSpecifiedException will be thrown if no device target is specified
+     */
+    function send(){
+
+        if($this->message->token===null){
+            throw new FcmTargetNotSpecifiedException();
+        }
         try {
             $this->message->send($this->request());
         }catch(UnregisteredException $e){
             if($this->invalidTokenEvent) {
-                event($this->invalidTokenEvent,$target);
+                event($this->invalidTokenEvent,$this->message->target);
             }
             throw $e;
         }
 
-    }
-
-    /**
-     * @param string $token Device FCM token
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException
-     */
-    function sendToDevice($token){
-        $this->send(new Token($token));
-    }
-
-    /**
-     * @param string $topicName
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException
-     */
-    function sendToTopic($topicName){
-        $this->send(new Topic($topicName));
-    }
-
-    /**
-     * @param string $condition
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException
-     */
-    function sendToCondition($condition){
-        $this->send(new Condition($condition));
     }
 
 }
