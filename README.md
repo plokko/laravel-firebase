@@ -1,11 +1,6 @@
 # Laravel Firebase
 
 [![Build Status](https://travis-ci.org/plokko/laravel-firebase.svg?branch=master)](https://travis-ci.org/plokko/laravel-firebase)
-[![styleci](https://styleci.io/repos/CHANGEME/shield)](https://styleci.io/repos/CHANGEME)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/plokko/laravel-firebase/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/plokko/laravel-firebase/?branch=master)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/CHANGEME/mini.png)](https://insight.sensiolabs.com/projects/CHANGEME)
-[![Coverage Status](https://coveralls.io/repos/github/plokko/laravel-firebase/badge.svg?branch=master)](https://coveralls.io/github/plokko/laravel-firebase?branch=master)
-
 [![Packagist](https://img.shields.io/packagist/v/plokko/laravel-firebase.svg)](https://packagist.org/packages/plokko/laravel-firebase)
 [![Packagist](https://poser.pugx.org/plokko/laravel-firebase/d/total.svg)](https://packagist.org/packages/plokko/laravel-firebase)
 [![Packagist](https://img.shields.io/packagist/l/plokko/laravel-firebase.svg)](https://packagist.org/packages/plokko/laravel-firebase)
@@ -87,7 +82,8 @@ class TestFcmNotification extends Notification implements ShouldQueue
 
 ### Real time database
 To get an instance of the database use the `FirebaseDb` facade:
-``
+
+```php
 $test = FirebaseDb::getReference('test'); //get the reference for item /test
 $test->get('01');//Get /test/01 as an array
 $test01 = $test->getReference('01');//Get a reference for /test/01
