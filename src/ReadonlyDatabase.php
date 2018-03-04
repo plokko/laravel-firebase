@@ -2,30 +2,22 @@
 namespace Plokko\LaravelFirebase;
 
 use Plokko\Firebase\IO\Database;
+use Plokko\Firebase\IO\Reference;
 
 /**
  * Wrapper of Plokko\Firebase\IO\Database that disabes write operations
  * @package Plokko\LaravelFirebase
  */
-class ReadonlyDatabase
+class ReadonlyDatabase extends Database
 {
-    private
-        /**@var \Plokko\Firebase\IO\Database **/
-        $database;
-    function __construct(Database $db)
-    {
-        $this->database = $db;
-    }
 
-    function __call($name, $arguments)
+    // Disable write functions
+    function set($path, $value){}
+    function update($path, $value){}
+    function delete($path){}
+
+    function getReference($path)
     {
-        switch($name){
-            case 'set':
-            case 'update':
-            case 'delete':
-                return false;
-            default:
-                return call_user_func_array([$this->database,$name],$arguments);
-        }
+        return new Reference($this,$path);
     }
 }
