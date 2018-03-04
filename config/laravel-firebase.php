@@ -2,6 +2,11 @@
 
 return [
     /**
+     * Enables or disables write sync with firebase database (usefull for debugging purpuses)
+     */
+    'read_only' => false,
+
+    /**
      * Firebase service account information, can be either:
      * - string : absolute path to serviceaccount json file
      * - string : content of serviceaccount (json string)
@@ -20,7 +25,7 @@ return [
      * if null default cache driver will be used
      * @var string|null
      */
-    'cache_driver'=>null,
+    'cache_driver' => null,
 
     /**
      * Specify if and what event to trigger if an invalid token is returned

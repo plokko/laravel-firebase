@@ -59,7 +59,7 @@ class ModelSynchronizer
      * @param array|null $updatedFields if present only the keys in array will be updated
      */
     static function update(Model $model,array $updatedFields=null){
-        $data=self::getData($model);
+        $data = self::getData($model);
         if($updatedFields){
             $data = array_intersect_key($data, array_flip($updatedFields));
             self::getReference($model)->update('',$data);
