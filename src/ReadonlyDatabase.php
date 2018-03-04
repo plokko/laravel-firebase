@@ -17,20 +17,15 @@ class ReadonlyDatabase
         $this->database = $db;
     }
 
-    function set($path,$value){
-        //Disabled
-    }
-
-    function update($path,$value){
-        //Disabled
-    }
-
-    function delete($path){
-        //Disabled
-    }
-
     function __call($name, $arguments)
     {
-        return call_user_func_array([$this->database,$name],$arguments);
+        switch($name){
+            case 'set':
+            case 'update':
+            case 'delete':
+                return false;
+            default:
+                return call_user_func_array([$this->database,$name],$arguments);
+        }
     }
 }
