@@ -4,7 +4,7 @@ return [
     /**
      * Enables or disables write sync with firebase database (usefull for debugging purpuses)
      */
-    'read_only' => false,
+    'read_only' => env('FIREBASEDB_READONLY',false),
 
     /**
      * Firebase service account information, can be either:
