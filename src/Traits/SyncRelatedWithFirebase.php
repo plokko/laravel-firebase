@@ -13,26 +13,34 @@ use Plokko\LaravelFirebase\Relations\SyncWithFirebaseBelongsToMany;
  */
 trait SyncRelatedWithFirebase
 {
-    /*
-    protected
-        /**
-         * Set what relations to sync with firebase
-         * The related model MUST use SyncWithFirebase trait
-         * @var array array of the relations to sync with firebase
-         * /
-        $syncRelationWithFirebase=[];
-    */
 
     /**
-     * Returns all the relation that needs to be synched with firebase
-     * @return array
+     * Specifies the relations that needs to be automatically synched with firebase
+     * @return array relations to be synched with firebase, default []
      */
     protected function getRelationsToSyncWithFirebase(){
         return [];
     }
 
     /**
-     * Instantiate a new BelongsToMany relationship.
+     * Manually syncs all related models with Firebase
+     * Note: only relations returned by getRelationsToSyncWithFirebase() will be synchronized
+     * @param string $only only sync specified relation (if in getRelationsToSyncWithFirebase() array)
+     */
+    final public function syncRelatedWithFirebase($only=null){
+        $related = $this->getRelationsToSyncWithFirebase();
+        if($only){
+            if(!in_array($only,$related))
+                return;//Not synched
+            $related = [$only];
+        }
+        foreach($related AS $k){
+            $this->$k->syncWithFirebase();
+        }
+    }
+
+    /**
+     * Overrides the BelongsToMany default relationship.
      *
      * @param  Builder  $query
      * @param  Model  $parent
