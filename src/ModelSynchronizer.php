@@ -13,11 +13,20 @@ class ModelSynchronizer
         /**@var Model */
         $model,
         /** @var bool */
-        $syncRelated;
+        $syncRelated = false;
 
     function __construct(Model $model){
         $this->model        = $model;
-        $this->syncRelated  = in_array(SyncRelatedWithFirebase::class,class_uses($this->model));
+    }
+
+    /**
+     * Enables/disables synching with related models (if supported)
+     * @param bool $withRelated
+     * @return $this
+     */
+    public function withRelated($withRelated=true){
+        $this->syncRelated  = $withRelated && in_array(SyncRelatedWithFirebase::class,class_uses($this->model));
+        return $this;
     }
 
     private function getData($onlyChanged=false){

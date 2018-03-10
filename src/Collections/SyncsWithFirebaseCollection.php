@@ -5,9 +5,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class SyncsWithFirebaseCollection extends Collection
 {
-    public function syncWithFirebase(){
+    public function syncWithFirebase($withRelated=false){
         foreach($this AS $e){
-            $e->syncWithFirebase();
+            $e->syncWithFirebase($withRelated);
         }
     }
 }

@@ -20,29 +20,29 @@ trait SyncWithFirebase
     public static function bootSyncWithFirebase(){
         static::created(function ($model) {
             $sync = new ModelSynchronizer($model);
-            $sync->create();
+            $sync->withRelated()->create();
         });
 
         static::updated(function ($model) {
             $sync = new ModelSynchronizer($model);
-            $sync->update();
+            $sync->withRelated()->update();
         });
 
         static::deleted(function ($model) {
             $sync = new ModelSynchronizer($model);
-            $sync->delete();
+            $sync->withRelated()->delete();
         });
         if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses(self::class))){
             static::restored(function ($model) {
                 $sync = new ModelSynchronizer($model);
-                $sync->create();
+                $sync->withRelated()->create();
             });
         }
     }
 
-    public function syncWithFirebase(){
+    public function syncWithFirebase($withRelated=false){
         $sync = new ModelSynchronizer($this);
-        $sync->create();
+        $sync->withRelated($withRelated)->create();
     }
 
     /**
