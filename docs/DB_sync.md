@@ -37,6 +37,19 @@ class MyModel extends Model
     
 }
 ```
+### Changing reference name
+By default the model will be synchromized to Firebase using the table name (ex. User model using _users_ table will be sync to _/users_);
+you can change this behaivour by extending the `getFirebaseReferenceName` method and returning a custom reference name
+```php
+
+    /**
+     * @return string reference name
+     */
+    public function getFirebaseReferenceName(){
+        return 'my_custom_reference';// default : $this->getTable();
+    }
+```
+
 ## Sync related models
 Sometimes you want to serialize to firebase data from othe related models but the changes in the related model will not be automatically updated on the base model and vice-versa.
 You can extend the model synchronization to related models using the `SyncRelatedWithFirebase` trait in your Model and extend the `getRelationsToSyncWithFirebase()` function to return an array of relations you want to keep in sync
