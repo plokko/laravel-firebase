@@ -78,3 +78,22 @@ class MyModel extends Model
 }
 ```
 This trait will automatically sync related model every time a m-n relation is changed or the model is saved.
+
+### Advanced sync options
+Sometimes the content of a model must be synchronized with an unrelated or you need to trigger the sync just in some conditions.
+
+You can customize what an when to trigger related mode synchromization by changing the return value of `getRelationsToSyncWithFirebase`:
+accepted value for the array values are:
+ - simple: 'relation_name' - simple relation synching
+ - with filter: 'relation_name' => function($query){} - filter the relationship
+ - Custom query: function(){} - return a query to sync with Firebase
+ 
+ ```php
+     function getRelationsToSyncWithFirebase(){
+        return [
+          'target',//Normal
+          'client'=>function($query){$query->where('is_premium','=',1);},//With filter
+          function(){ return UnrelatedModel::where('condition','value');},//Custom query
+       ];
+    }
+```
