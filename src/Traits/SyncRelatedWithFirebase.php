@@ -49,7 +49,7 @@ trait SyncRelatedWithFirebase
                     $this->$v->syncWithFirebase();
                 }elseif(is_callable($v)){
                     //Custom query
-                    $v()->syncWithFirebase();
+                    $v()->get()->syncWithFirebase();
                 }
             }else{
                 if(is_callable($v)){
