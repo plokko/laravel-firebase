@@ -37,3 +37,5 @@ class MyModel extends Model
     
 }
 ```
+## Sync related models
+WIP
