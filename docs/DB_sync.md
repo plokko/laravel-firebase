@@ -13,7 +13,7 @@ class MyModel extends Model
 ```
 This model will add the `syncWithFirebase` method that manually syncs the model to Firebase and will be triggered at each model modification done throught eloquent(save,update,delete,restore).
 
-You can customize what will be synched with Firebase via the `toFirebase` method:
+You can customize what will be synched with Firebase via the `toFirebase` method otherwise the output of toArray will be used instead
 ```php
 use Plokko\LaravelFirebase\Traits\SyncWithFirebase;
 
