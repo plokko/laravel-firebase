@@ -81,6 +81,8 @@ class TestFcmNotification extends Notification implements ShouldQueue
 ```
 
 ### Real time database
+
+#### Query the Realtime database
 To get an instance of the database use the `FirebaseDb` facade:
 
 ```php
@@ -89,3 +91,5 @@ $test->get('01');//Get /test/01 as an array
 $test01 = $test->getReference('01');//Get a reference for /test/01
 $test01->set('label','value');//Set /test/01/label = value
 ```
+#### Sync models to Firebase
+[see Firebase database sync](docs/DB_sync.md)
