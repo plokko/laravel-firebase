@@ -7,35 +7,76 @@
 
 Laravel Firebase integration
 
+This package includes:
+ - Firebase OAuthV2.0 authentication, with token caching
+ - Centralized ServiceAccount credential management
+ - Firebase FCM Http V1 API and Firebase Realtime database REST api via OAuth authentication
+ - Firebase JWT token generator (via php-jwt)
+ - Automatic sync for Eloquent models to Firebase Realtime db
+ - Automatic sync triggers on related model changes
+
 ## Installation
 
 Install via composer
 ```bash
 composer require plokko/laravel-firebase
 ```
+The package will be auto registered in laravel >=5.5;
+**If you use laravel <5.5 follow the next two steps**
 
-### Register Service Provider
-
-**Note! This and next step are optional if you use laravel>=5.5 with package
-auto discovery feature.**
-
-Add service provider to `config/app.php` in `providers` section
+1. Add service provider to `config/app.php` in `providers` section
 ```php
 Plokko\LaravelFirebase\ServiceProvider::class,
 ```
 
-### Register Facade
-
-Register package facade in `config/app.php` in `aliases` section
+2. Register package facade in `config/app.php` in `aliases` section
 ```php
 Plokko\LaravelFirebase\Facades\LaravelFirebase::class,
 ```
+Your file in `config/laravel-firebase.php` should now look like this:
+```php
+<?php
 
-### Publish Configuration File
+return [
+    'read_only' => env('FIREBASEDB_READONLY',false),//DEBUG
 
+    /**
+     * Firebase service account information, can be either:
+     * - string : absolute path to serviceaccount json file
+     * - string : content of serviceaccount (json string)
+     * - array : php array conversion of the serviceaccount
+     * @var array|string
+     */
+    'service_account' => base_path('.firebase-credentials.json'),
+
+    /**
+     * If set to true will enable Google OAuth2.0 token cache storage
+     */
+    'cache' => true,
+
+    /**
+     * Cache driver for OAuth token cache,
+     * if null default cache driver will be used
+     * @var string|null
+     */
+    'cache_driver' => null,
+
+    /**
+     * Specify if and what event to trigger if an invalid token is returned
+     * @var string|null
+     */
+    'FCMInvalidTokenTriggerEvent' => null,
+];
+
+```
+
+### Configuration
+Publish the configuration file via
 ```bash
 php artisan vendor:publish --provider="Plokko\LaravelFirebase\ServiceProvider" --tag="config"
 ```
+
+
 
 ## Usage
 ### JWT token
@@ -88,6 +129,12 @@ class TestFcmNotification extends Notification implements ShouldQueue
 
 ### Real time database
 
+##### Settings:
+You can enable read-only access to database setting 
+```
+FIREBASEDB_READONLY=true
+```
+on your `.env` file, this is usefull for testing purpuses, the writes will not return any error but will not be executed on Firebase.
 #### Query the Realtime database
 To get an instance of the database use the `FirebaseDb` facade:
 
