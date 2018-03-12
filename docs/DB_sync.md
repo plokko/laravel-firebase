@@ -38,4 +38,30 @@ class MyModel extends Model
 }
 ```
 ## Sync related models
-WIP
+Sometimes you want to serialize to firebase data from othe related models but the changes in the related model will not be automatically updated on the base model and vice-versa.
+You can extend the model synchronization to related models using the `SyncRelatedWithFirebase` trait in your Model and extend the `getRelationsToSyncWithFirebase()` function to return an array of relations you want to keep in sync
+```php
+use Plokko\LaravelFirebase\Traits\SyncWithFirebase;
+
+class MyModel extends Model
+{
+    use SyncWithFirebase,
+        SyncRelatedWithFirebase;
+
+    
+    /**
+     * Specifies the relations that needs to be automatically synched with firebase
+     * @return array relations to be synched with firebase, default []
+     */
+    protected function getRelationsToSyncWithFirebase(){
+        return [
+          'myRelation',
+          'myOtherRelation'
+        ];
+    }
+    public function myRelation(){
+      return $this->belongsToMany(OtherModel::class);
+    }
+}
+```
+This trait will automatically sync related model every time a m-n relation is changed or the model is saved.
