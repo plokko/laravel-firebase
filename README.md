@@ -38,6 +38,12 @@ php artisan vendor:publish --provider="Plokko\LaravelFirebase\ServiceProvider" -
 ```
 
 ## Usage
+### JWT token
+You can easly create a Firebase JWT token (for auth) with `FirebaseJWT::encode`:
+
+```php
+FirebaseJWT::encode($uid,['optional'=>'custom-claims-array']);
+```
 
 ### FCM
 This package allows you to send FCM messages via FCM http v1 api
