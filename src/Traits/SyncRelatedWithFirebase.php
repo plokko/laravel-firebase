@@ -16,6 +16,10 @@ trait SyncRelatedWithFirebase
 
     /**
      * Specifies the relations that needs to be automatically synched with firebase
+     * Possible item values:
+     *  - 'realtion' - relationship name
+     *  - 'relation' => function($query){/*filters*\/} - Filtered query
+     *  - function(){}:Model|SyncsWithFirebaseCollection - return a custom query to sync
      * @return array relations to be synched with firebase, default []
      */
     protected function getRelationsToSyncWithFirebase(){
@@ -30,12 +34,29 @@ trait SyncRelatedWithFirebase
     final public function syncRelatedWithFirebase($only=null){
         $related = $this->getRelationsToSyncWithFirebase();
         if($only){
-            if(!in_array($only,$related))
-                return;//Not synched
-            $related = [$only];
+            if(in_array($only,$related)){
+                $related = [$only];
+            }elseif(array_key_exists($only,$related)){
+                $related = [$only => $related[$only]];
+            }else{
+                return;
+            }
         }
-        foreach($related AS $k){
-            $this->$k->syncWithFirebase();
+        foreach($related AS $k=>$v){
+            if(is_numeric($k)){
+                if(is_string($v)){
+                    //Simple relationship array
+                    $this->$v->syncWithFirebase();
+                }elseif(is_callable($v)){
+                    //Custom query
+                    $v()->syncWithFirebase();
+                }
+            }else{
+                if(is_callable($v)){
+                    //Query filter
+                    $v($this->$k())->get()->syncWithFirebase();
+                }
+            }
         }
     }
 
