@@ -43,19 +43,28 @@ trait SyncRelatedWithFirebase
             }
         }
         foreach($related AS $k=>$v){
+            $el = null;
+            /**@var Model $el**/
+
+            // Get the related model to sync
             if(is_numeric($k)){
                 if(is_string($v)){
                     //Simple relationship array
-                    $this->$v->syncWithFirebase();
+                    $el = $this->$v;
                 }elseif(is_callable($v)){
                     //Custom query
-                    $v()->get()->syncWithFirebase();
+                    $el = $v()->get();
                 }
             }else{
                 if(is_callable($v)){
                     //Query filter
-                    $v($this->$k())->get()->syncWithFirebase();
+                    $el = $v($this->$k())->get();
                 }
+            }
+            
+            // Sync the model IF not null
+            if($el){
+                $el->syncWithFirebase();
             }
         }
     }
