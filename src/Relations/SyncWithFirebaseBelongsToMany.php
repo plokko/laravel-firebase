@@ -70,7 +70,6 @@ class SyncWithFirebaseBelongsToMany extends BelongsToMany
 
     protected function syncParentWithFirebase(){
         if($this->_isSynching){
-            //TODO:should only update touched relation
             $this->parent->syncWithFirebase();
             $this->parent->syncRelatedWithFirebase();
         }
