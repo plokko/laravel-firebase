@@ -12,7 +12,7 @@
   "require": {
     "php": ">=5.6",
     "plokko/firebase-php":"^0.1.1",
-    "illuminate/support": "^5.4.0|^6.0"
+    "illuminate/support": "^5.4.0|^6.0|^7.0"
   },
   "require-dev": {
     "orchestra/testbench": "~3.6.0",
