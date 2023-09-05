@@ -10,8 +10,8 @@
   ],
   "type": "library",
   "require": {
-    "php": ">=7.0",
-    "plokko/firebase-php":"^0.2.0",
+    "php": ">=7.1",
+    "plokko/firebase-php":"^0.2.4",
     "illuminate/support": ">=5.4.0"
   },
   "require-dev": {
