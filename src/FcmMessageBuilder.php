@@ -67,6 +67,17 @@ class FcmMessageBuilder
     }
 
     /**
+     * Set the notification sound (Android/IOS);
+     * set to "default" for default sound, null to remove
+     * @param string $sound
+     * @return $this
+     */
+    function notificationSound($sound){
+        $this->message->android->notification->sound = $sound;
+        return $this;
+    }
+
+    /**
      * Set the notification body
      * @param string $body
      * @return $this
@@ -79,7 +90,7 @@ class FcmMessageBuilder
     /**
      * Set the message priority
      * @param 'high'|"normal" $priority
-     * @return FcmMessageBuilder
+     * @return $this
      */
     function priority($priority){
         if($priority!=='high' && $priority!=='normal')
@@ -87,10 +98,40 @@ class FcmMessageBuilder
         $this->message->android->setPriority($priority);
         return $this;
     }
+    /**
+     * Set the message tag (Android/IOS)
+     * @param string $tag
+     * @return $this
+     */
+    function notificationTag($tag){
+        $this->message->android->notification->tag = $tag;
+        return $this;
+    }
+
+
+    /**
+     * Set Android message options with a callback
+     * @param Closure(\Plokko\Firebase\FCM\Message\AndroidNotification) $closure
+     * @return $this
+     */
+    function setAndroidNotification($closure){
+        $closure($this->android->notification);
+        return $this;
+    }
+
+    /**
+     * Set Android message options with a callback
+     * @param Closure(\Plokko\Firebase\FCM\Message\AndroidConfig) $closure
+     * @return $this
+     */
+    function setAndroidConfig($closure){
+        $closure($this->android);
+        return $this;
+    }
 
     /**
      * Set high priority
-     * @return FcmMessageBuilder
+     * @return $this
      */
     function highPriority(){
         $this->priority('high');
@@ -99,7 +140,7 @@ class FcmMessageBuilder
 
     /**
      * Set normal priority
-     * @return FcmMessageBuilder
+     * @return $this
      */
     function normalPriority(){
         $this->priority('normal');
@@ -109,7 +150,7 @@ class FcmMessageBuilder
     /**
      * Set the time to live of the message
      * @param string $ttl TTL as a string (ex. '14.5s')
-     * @return FcmMessageBuilder
+     * @return $this
      */
     function ttl($ttl){
         $this->message->android->ttl($ttl);
