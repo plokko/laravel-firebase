@@ -1,28 +1,35 @@
 <?php
 namespace Plokko\LaravelFirebase;
 
-
+use JsonSerializable;
 use Plokko\Firebase\ServiceAccount;
 use Plokko\Firebase\FCM\{
-    Exceptions\UnregisteredException, Message, Request, Targets\Condition, Targets\Target, Targets\Token, Targets\Topic
+    Exceptions\UnregisteredException,
+    Message,
+    Request,
+    Targets\Condition,
+    Targets\Target,
+    Targets\Token,
+    Targets\Topic
 };
 use Plokko\LaravelFirebase\Exceptions\FcmTargetNotSpecifiedException;
+use Illuminate\Contracts\Support\Arrayable;
 
-class FcmMessageBuilder
+class FcmMessageBuilder implements JsonSerializable, Arrayable
 {
     private
-        /**
-         * @var ServiceAccount
-         */
-        $serviceAccount,
-        /**
-         * @var Message
-         */
-        $message,
-        /**
-         * @var string|null
-         */
-        $invalidTokenEvent;
+    /**
+     * @var ServiceAccount
+     */
+    $serviceAccount,
+    /**
+     * @var Message
+     */
+    $message,
+    /**
+     * @var string|null
+     */
+    $invalidTokenEvent;
 
     function __construct(ServiceAccount $serviceAccount)
     {
@@ -35,13 +42,15 @@ class FcmMessageBuilder
      * @param string $eventName
      * @return $this
      */
-    function setInvalidTokenEvent($eventName){
+    function setInvalidTokenEvent($eventName)
+    {
         $this->invalidTokenEvent = $eventName;
         return $this;
     }
 
 
-    function __get($k){
+    function __get($k)
+    {
         return $this->message->{$k};
     }
 
@@ -51,7 +60,8 @@ class FcmMessageBuilder
      * @param array $data
      * @return $this
      */
-    function data(array $data){
+    function data(array $data)
+    {
         $this->message->data->fill($data);
         return $this;
     }
@@ -61,7 +71,8 @@ class FcmMessageBuilder
      * @param string $title
      * @return $this
      */
-    function notificationTitle($title){
+    function notificationTitle($title)
+    {
         $this->message->notification->setTitle($title);
         return $this;
     }
@@ -69,11 +80,16 @@ class FcmMessageBuilder
     /**
      * Set the notification sound (Android/IOS);
      * set to "default" for default sound, null to remove
-     * @param string $sound
+     * @param string $sound Sound name (use 'default' for default sound)
+     * @param bool|string $applyApns Specify also in apns payload data for IOS, if true is used $sound will be used, with false apns will not be set otherwise the specified value will be used.
      * @return $this
      */
-    function notificationSound($sound){
+    function notificationSound($sound, $apns = true)
+    {
         $this->message->android->notification->sound = $sound;
+        if ($apns !== false) {
+            $this->setApnsApsData('sound', $apns === true ? $sound : $apns);
+        }
         return $this;
     }
 
@@ -82,7 +98,8 @@ class FcmMessageBuilder
      * @param string $body
      * @return $this
      */
-    function notificationBody($body){
+    function notificationBody($body)
+    {
         $this->message->notification->setBody($body);
         return $this;
     }
@@ -92,8 +109,9 @@ class FcmMessageBuilder
      * @param 'high'|"normal" $priority
      * @return $this
      */
-    function priority($priority){
-        if($priority!=='high' && $priority!=='normal')
+    function priority($priority)
+    {
+        if ($priority !== 'high' && $priority !== 'normal')
             throw new \InvalidArgumentException('Invalid priority value!');
         $this->message->android->setPriority($priority);
         return $this;
@@ -103,7 +121,8 @@ class FcmMessageBuilder
      * @param string $tag
      * @return $this
      */
-    function notificationTag($tag){
+    function notificationTag($tag)
+    {
         $this->message->android->notification->tag = $tag;
         return $this;
     }
@@ -114,7 +133,8 @@ class FcmMessageBuilder
      * @param Closure(\Plokko\Firebase\FCM\Message\AndroidNotification) $closure
      * @return $this
      */
-    function setAndroidNotification($closure){
+    function setAndroidNotification($closure)
+    {
         $closure($this->android->notification);
         return $this;
     }
@@ -124,7 +144,8 @@ class FcmMessageBuilder
      * @param Closure(\Plokko\Firebase\FCM\Message\AndroidConfig) $closure
      * @return $this
      */
-    function setAndroidConfig($closure){
+    function setAndroidConfig($closure)
+    {
         $closure($this->android);
         return $this;
     }
@@ -133,7 +154,8 @@ class FcmMessageBuilder
      * Set high priority
      * @return $this
      */
-    function highPriority(){
+    function highPriority()
+    {
         $this->priority('high');
         return $this;
     }
@@ -142,7 +164,8 @@ class FcmMessageBuilder
      * Set normal priority
      * @return $this
      */
-    function normalPriority(){
+    function normalPriority()
+    {
         $this->priority('normal');
         return $this;
     }
@@ -152,11 +175,67 @@ class FcmMessageBuilder
      * @param string $ttl TTL as a string (ex. '14.5s')
      * @return $this
      */
-    function ttl($ttl){
+    function ttl($ttl)
+    {
         $this->message->android->ttl($ttl);
         return $this;
     }
 
+    /**
+     * Set Aps data in the Apns payload
+     * @param string $key Key to set
+     * @param mixed $value Value to set
+     * @return $this
+     */
+    function setApnsApsData($key, $value)
+    {
+        $this->message->apns->payload->aps->$key = $value;
+        return $this;
+    }
+
+    /**
+     * Set Apns payload data
+     * @param string $key Key of the payload to set
+     * @param mixed $value Value of the payload to set
+     * @return $this
+     */
+    function setApnsPayload($key, $value)
+    {
+        $this->message->apns->payload->$key = $value;
+        return $this;
+    }
+
+    /**
+     * Get Apns payload data
+     * @param string $key Key of the payload to get
+     * @return mixed
+     */
+    function getApnsPayloadValue($key)
+    {
+        return $this->message->apns->payload->$key;
+    }
+
+    /**
+     * Set Apns header data
+     * @param string $key Key of the header to set
+     * @param mixed $value Value of the header to set
+     * @return $this
+     */
+    function setApnsHeader($key, $value)
+    {
+        $this->message->apns->header->$key = $value;
+        return $this;
+    }
+
+    /**
+     * Get Apns header data
+     * @param string $key Key of the header to get
+     * @return mixed
+     */
+    function getApnsHeaderValue($key)
+    {
+        return $this->message->header->$key;
+    }
 
     /**
      * Set the message destination,
@@ -164,7 +243,8 @@ class FcmMessageBuilder
      * @param Target $target
      * @return FcmMessageBuilder
      */
-    function toTarget(Target $target){
+    function toTarget(Target $target)
+    {
         $this->message->setTarget($target);
         return $this;
     }
@@ -174,7 +254,8 @@ class FcmMessageBuilder
      * @param string $token Target device FCM token
      * @return FcmMessageBuilder
      */
-    function toDevice($token){
+    function toDevice($token)
+    {
         return $this->toTarget(new Token($token));
     }
 
@@ -183,7 +264,8 @@ class FcmMessageBuilder
      * @param string $topicName Target topic name
      * @return FcmMessageBuilder
      */
-    function toTopic($topicName){
+    function toTopic($topicName)
+    {
         return $this->toTarget(new Topic($topicName));
     }
 
@@ -192,7 +274,8 @@ class FcmMessageBuilder
      * @param string $condition Target condition
      * @return FcmMessageBuilder
      */
-    function toCondition($condition){
+    function toCondition($condition)
+    {
         return $this->toTarget(new Condition($condition));
     }
 
@@ -201,7 +284,8 @@ class FcmMessageBuilder
      * @internal
      * @return Request
      */
-    private function request(){
+    private function request()
+    {
         return new Request($this->serviceAccount);
     }
 
@@ -212,20 +296,87 @@ class FcmMessageBuilder
      * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException FCMError exception
      * @throws FcmTargetNotSpecifiedException will be thrown if no device target is specified
      */
-    function send(){
+    function send()
+    {
 
-        if($this->message->target === null){
+        if ($this->message->target === null) {
             throw new FcmTargetNotSpecifiedException();
         }
         try {
             $this->message->send($this->request());
-        }catch(UnregisteredException $e){
-            if($this->invalidTokenEvent) {
-                event($this->invalidTokenEvent,$this->message->target);
+        } catch (UnregisteredException $e) {
+            if ($this->invalidTokenEvent) {
+                event($this->invalidTokenEvent, $this->message->target);
             }
             throw $e;
         }
 
     }
 
+
+    /**
+     * Validate the message with Firebase without submitting it
+     * @throws \GuzzleHttp\Exception\GuzzleException Generic http exception
+     * @throws \Plokko\Firebase\FCM\Exceptions\FcmErrorException FCMError exception
+     * @throws FcmTargetNotSpecifiedException will be thrown if no device target is specified
+     */
+    function validate()
+    {
+        if ($this->message->target === null) {
+            throw new FcmTargetNotSpecifiedException();
+        }
+        try {
+            $this->message->validate($this->request());
+        } catch (UnregisteredException $e) {
+            if ($this->invalidTokenEvent) {
+                event($this->invalidTokenEvent, $this->message->target);
+            }
+            throw $e;
+        }
+
+    }
+
+    /**
+     * Get FCM message class
+     * @return Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * Get FCM message payload
+     * @return array
+     */
+    public function getPayload()
+    {
+        return $this->message->getPayload();
+    }
+
+    /**
+     * Cast to array
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->getPayload();
+    }
+
+    /**
+     * Cast for JSON serialization
+     * @return array
+     */
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
+    }
+    /**
+     * Cast to string (as JSON string)
+     * @return string
+     */
+    function __toString()
+    {
+        return json_encode($this);
+    }
 }
