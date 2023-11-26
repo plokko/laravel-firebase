@@ -17,7 +17,7 @@ class FcmNotificationChannel
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
-    public function send($notifiable,Notification $notification)
+    public function send($notifiable, Notification $notification)
     {
         $message = $notification->toFcm($notifiable);
         $message->send();

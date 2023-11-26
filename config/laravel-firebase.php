@@ -4,7 +4,7 @@ return [
     /**
      * Enables or disables write sync with firebase database (usefull for debugging purpuses)
      */
-    'read_only' => env('FIREBASEDB_READONLY',false),
+    'read_only' => env('FIREBASEDB_READONLY', false),
 
     /**
      * Firebase service account information, can be either:
@@ -32,4 +32,17 @@ return [
      * @var string|null
      */
     'FCMInvalidTokenTriggerEvent' => null,
+
+    /**
+     * Specify wich Firebase Realtime DB URL to use
+     * @var string
+     */
+    'default_db' => 'default',
+    'firebasedb_urls' => [
+        /**
+         * Specify the Firebase Realtime DB URL, if not set https://<project_id>.firebaseio.com/ will be used
+         * @var string|null
+         */
+        'default' => rtrim(env('FIREBASEDB_URL', null), '/'),
+    ],
 ];

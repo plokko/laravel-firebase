@@ -3,11 +3,12 @@ namespace Plokko\LaravelFirebase\Facades;
 
 
 use Illuminate\Support\Facades\Facade;
+use Plokko\LaravelFirebase\FcmMessageBuilder;
 
 class FCM extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Plokko\LaravelFirebase\FcmMessageBuilder::class;
+        return FcmMessageBuilder::class;
     }
 }

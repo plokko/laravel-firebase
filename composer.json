@@ -11,7 +11,7 @@
   "type": "library",
   "require": {
     "php": ">=7.1",
-    "plokko/firebase-php":"^0.2.4",
+    "plokko/firebase-php":"^0.3.0",
     "illuminate/support": ">=5.4.0"
   },
   "require-dev": {

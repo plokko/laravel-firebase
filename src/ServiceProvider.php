@@ -10,7 +10,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         CONFIG_PATH = __DIR__ . '/../config/laravel-firebase.php';
 
     protected
-        $defer = false;
+    $defer = false;
 
     public function boot()
     {
@@ -27,33 +27,36 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         );
 
         // Provides the Firebase ServiceAccount
-        $this->app->singleton(ServiceAccount::class,function($app){
+        $this->app->singleton(ServiceAccount::class, function ($app) {
             $sa = new ServiceAccount(config('laravel-firebase.service_account'));
             // Add cache handler if cache is enabled
-            if(config('laravel-firebase.cache')){
+            if (config('laravel-firebase.cache')) {
                 $sa->setCacheHandler(new ServiceAccountCacheItemPool());
             }
             return $sa;
         });
 
         // Provide Firebase Database
-        $this->app->singleton(Database::class,function($app){
-            return (config('laravel-firebase.read_only'))?
-                        new ReadonlyDatabase($app->make(ServiceAccount::class)):
-                        new Database($app->make(ServiceAccount::class));
+        $this->app->singleton(Database::class, function ($app, array $opt = []) {
+            $dbName = $opt['db'] ?? config('laravel-firebase.default_db');
+            $dbUrl = config('laravel-firebase.firebasedb_urls.' . $dbName);
+
+            return (config('laravel-firebase.read_only')) ?
+                new ReadonlyDatabase($app->make(ServiceAccount::class), $dbUrl) :
+                new Database($app->make(ServiceAccount::class), $dbUrl);
         });
 
-        $this->app->bind(FcmMessageBuilder::class,function($app){
+        $this->app->bind(FcmMessageBuilder::class, function ($app) {
             $fcm = new FcmMessageBuilder($app->make(ServiceAccount::class));
 
             $event = config('laravel-firebase.FCMInvalidTokenTriggerEvent');
-            if($event){
+            if ($event) {
                 $fcm->setInvalidTokenEvent($event);
             }
             return $fcm;
         });
 
-        $this->app->singleton(JWT::class,function($app){
+        $this->app->singleton(JWT::class, function ($app) {
             return new JWT($app->make(ServiceAccount::class));
         });
     }

@@ -17,7 +17,8 @@ trait SyncWithFirebase
          $firebaseReference
      */
 
-    public static function bootSyncWithFirebase(){
+    public static function bootSyncWithFirebase()
+    {
         static::created(function ($model) {
             $sync = new ModelSynchronizer($model);
             $sync->withRelated()->create();
@@ -32,7 +33,7 @@ trait SyncWithFirebase
             $sync = new ModelSynchronizer($model);
             $sync->withRelated()->delete();
         });
-        if(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses(self::class))){
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses(self::class))) {
             static::restored(function ($model) {
                 $sync = new ModelSynchronizer($model);
                 $sync->withRelated()->create();
@@ -40,7 +41,8 @@ trait SyncWithFirebase
         }
     }
 
-    public function syncWithFirebase($withRelated=false){
+    public function syncWithFirebase($withRelated = false)
+    {
         $sync = new ModelSynchronizer($this);
         $sync->withRelated($withRelated)->create();
     }
@@ -72,7 +74,8 @@ trait SyncWithFirebase
     /**
      * @return string reference name
      */
-    public function getFirebaseReferenceName(){
+    public function getFirebaseReferenceName()
+    {
         return $this->getTable();
     }
 
