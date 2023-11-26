@@ -1,14 +1,13 @@
 <?php
 namespace Plokko\LaravelFirebase;
 
-use Plokko\Firebase\IO\Database;
 use Plokko\Firebase\IO\Reference;
 
 /**
  * Wrapper of Plokko\Firebase\IO\Database that disabes write operations
  * @package Plokko\LaravelFirebase
  */
-class ReadonlyDatabase extends Database
+class ReadonlyDatabase extends RealtimeDb
 {
 
     // Disable write functions

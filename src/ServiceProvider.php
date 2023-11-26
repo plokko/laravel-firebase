@@ -37,13 +37,14 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Provide Firebase Database
-        $this->app->singleton(Database::class, function ($app, array $opt = []) {
+        $this->app->singleton(Database::class, RealtimeDb::class);
+        $this->app->singleton(RealtimeDb::class, function ($app, array $opt = []) {
             $dbName = $opt['db'] ?? config('laravel-firebase.default_db');
             $dbUrl = config('laravel-firebase.firebasedb_urls.' . $dbName);
 
             return (config('laravel-firebase.read_only')) ?
                 new ReadonlyDatabase($app->make(ServiceAccount::class), $dbUrl) :
-                new Database($app->make(ServiceAccount::class), $dbUrl);
+                new RealtimeDb($app->make(ServiceAccount::class), $dbUrl);
         });
 
         $this->app->bind(FcmMessageBuilder::class, function ($app) {
